@@ -15,7 +15,7 @@ public class Order {
 
     private Long userId;//用户id
 
-    private Integer discount;//折扣
+    private Float discount;//折扣
 
     private Long createTime;//下单时间
 
@@ -35,11 +35,11 @@ public class Order {
         this.userId = userId;
     }
 
-    public Integer getDiscount() {
+    public Float getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Integer discount) {
+    public void setDiscount(Float discount) {
         this.discount = discount;
     }
 

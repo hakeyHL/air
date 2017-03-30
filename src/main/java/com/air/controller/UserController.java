@@ -1,8 +1,11 @@
 package com.air.controller;
 
+import com.air.po.Order;
 import com.air.po.User;
+import com.air.po.UserContact;
 import com.air.service.OrderService;
 import com.air.service.TrainNumberService;
+import com.air.service.UserContactService;
 import com.air.service.UserService;
 import com.air.utils.IdCardCheck;
 import com.air.utils.StringUtils;
@@ -13,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +32,8 @@ public class UserController extends BaseController {
     TrainNumberService trainNumberService;
     @Resource
     OrderService orderService;
+    @Resource
+    UserContactService userContactService;
 
     //注册
     //用户名,密码,身份证,性别
@@ -70,13 +76,45 @@ public class UserController extends BaseController {
     //输入姓名,身份证号,性别进行校验; 一个人只能加5个联系人
     @RequestMapping("add/contact")
     private ModelAndView addContact(User user) {
+
         //0. 当前用户已拥有的联系人数,已为5则结束流程
+        List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
+        if (userContacts == null || userContacts.size() < 1) {
+            //结束
+        }
+        if (userContacts.size() == 5) {
+            //结束
+        }
         //1. 根据身份证号获取用户
+        User queryUser = new User();
+        user.setIdCardNumber(user.getIdCardNumber());
+        List<User> users = userService.listAllUser(queryUser);
+        if (users == null || users.size() < 1) {
+            //查无此人,结束
+        }
+
         //2. 用户是否已经为当前用户的联系人
-        //3. 是,结束
+        User addedUser = users.get(0);
+        boolean isContactAlready = false;
+        for (UserContact itUser : userContacts) {
+            if (itUser.getUserId() == addedUser.getId()) {
+                isContactAlready = true;
+            }
+        }
+        if (isContactAlready) {
+            //3. 是,结束
+            //结束,已经是联系人
+        }
         //4. 不是则校验用户输入其他信息是否与真实用户信息匹配
-        //5. 不匹配则拒绝
+        if (!addedUser.getIdCardNumber().equals(user.getIdCardNumber()) || !addedUser.getName().equals(user.getName())) {
+            //5. 不匹配则拒绝
+            //结束,有信息不正确
+        }
         //6. 匹配则添加至用户联系人列表中
+        UserContact userContact = new UserContact();
+        userContact.setUserId(currentUser.getId());
+        userContact.setContactUserId(addedUser.getId());
+        userContactService.saveContact(userContact);
         return modelAndView;
     }
 
@@ -85,16 +123,32 @@ public class UserController extends BaseController {
     //用户可以看到购票次数和所享折扣
     //Ticket
     @RequestMapping("ticket")
-    private ModelAndView ticket() {
+    private ModelAndView ticket(Order order) {
+        if (currentUser == null) {
+            //未登录,结束
+            return modelAndView;
+        }
+        order.setUserId(currentUser.getId());
+
         //1. 用户是否购买过当前车次
+
         int frequency = 0;
+        List<Order> userOrders = orderService.listOrdersByUserId(currentUser.getId());
+        if (userOrders != null && userOrders.size() > 0) {
+            frequency = userOrders.size();
+        }
         //1.1 有,则按照折扣规则进行折扣
         //1.2 无,则按照原价9.5折购买
         BigDecimal ticketDiscount = StringUtils.getTicketDiscount(frequency);
         //2. 购票
+        order.setCreateTime(new Date().getTime());
+        order.setDiscount(ticketDiscount.floatValue());
+
+        orderService.createOrder(order);
         //2.1 这里需要测试和实现票竞争的问题
 
-
+        userOrders.add(order);
+        modelAndView.addObject("orders", userOrders);
         //3. 购票完之后查看自己的订单
         return modelAndView;
     }

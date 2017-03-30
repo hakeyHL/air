@@ -1,5 +1,6 @@
 package com.air.controller;
 
+import com.air.po.User;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class BaseController {
     protected ModelAndView modelAndView = new ModelAndView();
     protected HttpServletRequest request;
+    protected User currentUser;
 
     /*
     * 注解ModelAttribute的意义是
@@ -28,5 +30,9 @@ public abstract class BaseController {
 
         //赋值request和response对象,以便获取request中的属性
         this.request = request;
+        User user = (User) this.request.getSession().getAttribute("user");
+        if (user != null) {
+            currentUser = user;
+        }
     }
 }
