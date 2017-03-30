@@ -24,8 +24,8 @@ import java.util.List;
  * Time 00:52
  */
 @Controller
-@RequestMapping("user")
-public class UserController extends BaseController {
+@RequestMapping("api")
+public class ApiController extends BaseController {
     @Resource
     UserService userService;
     @Resource
