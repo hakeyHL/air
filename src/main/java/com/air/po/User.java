@@ -13,12 +13,12 @@ public class User {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
+    private String loginName;//登录名
     private String name;//姓名
     private String password;//密码
     private String phone;//手机号
     private String idCardNumber;//身份证号
-    private byte sex;//性别 1 男 0女
+    private int sex = 3;//性别 1 男 0女 默认为3,表示性别未知
 
 
     public Long getId() {
@@ -53,11 +53,11 @@ public class User {
         this.idCardNumber = idCardNumber;
     }
 
-    public byte getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(byte sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 
@@ -67,5 +67,13 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 }
