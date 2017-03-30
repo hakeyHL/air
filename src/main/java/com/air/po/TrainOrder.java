@@ -7,7 +7,7 @@ import javax.persistence.*;
  * Time 00:59
  */
 @Entity
-public class Order {
+public class TrainOrder {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,6 +18,8 @@ public class Order {
     private Float discount;//折扣
 
     private Long createTime;//下单时间
+
+    private Long trainId;//车次id
 
     public Long getId() {
         return id;
@@ -49,5 +51,13 @@ public class Order {
 
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
+    }
+
+    public Long getTrainId() {
+        return trainId;
+    }
+
+    public void setTrainId(Long trainId) {
+        this.trainId = trainId;
     }
 }

@@ -17,6 +17,10 @@ public class UserContact {
 
     private Long contactUserId;//用户联系人id
 
+    //标注为不自动创建列
+    @Transient
+    private String userName;//乘车人姓名
+
     public Long getId() {
         return id;
     }
@@ -39,5 +43,13 @@ public class UserContact {
 
     public void setContactUserId(Long contactUserId) {
         this.contactUserId = contactUserId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

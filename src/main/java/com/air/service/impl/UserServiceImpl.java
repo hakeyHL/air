@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService {
     @Resource
     IDataBaseManager<User> dataBaseManager;
 
-    public int saveUser(User user) {
-        return (Integer) dataBaseManager.create(user);
+    public Long saveUser(User user) {
+        return (Long) dataBaseManager.create(user);
     }
 
     @Transactional
@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
         int i = 0;
         if (user != null) {
             if (StringUtils.isNotEmpty(user.getLoginName())) {
-                stringBuilder.append(" and t.loginName like \'?").append(i).append("%\' ");
-                params.add(user.getLoginName());
+                stringBuilder.append(" and t.loginName like ?").append(i);
+                params.add(user.getLoginName() + "%");
                 ++i;
             }
             if (StringUtils.isNotEmpty(user.getName())) {
@@ -47,25 +47,25 @@ public class UserServiceImpl implements UserService {
                 ++i;
             }
             if (StringUtils.isNotEmpty(user.getIdCardNumber())) {
-                stringBuilder.append(" and t.idCardNumber=?").append(i).append(user.getName());
+                stringBuilder.append(" and t.idCardNumber=?").append(i);
                 params.add(user.getIdCardNumber());
                 ++i;
             }
 
             if (StringUtils.isNotEmpty(user.getPassword())) {
-                stringBuilder.append(" and t.idCardNumber=?").append(i).append(user.getName());
-                params.add(user.getIdCardNumber());
+                stringBuilder.append(" and t.password=?").append(i);
+                params.add(user.getPassword());
                 ++i;
             }
 
             if (StringUtils.isNotEmpty(user.getPhone())) {
-                stringBuilder.append(" and t.phone=?").append(i).append(user.getPhone());
+                stringBuilder.append(" and t.phone=?").append(i);
                 params.add(user.getPhone());
                 ++i;
             }
 
             if (user.getSex() <= 1) {
-                stringBuilder.append(" and t.sex=?").append(i).append(user.getSex());
+                stringBuilder.append(" and t.sex=?").append(i);
                 params.add(user.getSex());
                 ++i;
             }

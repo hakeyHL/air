@@ -1,6 +1,7 @@
 package com.air.controller;
 
-import com.air.po.Order;
+import com.air.po.TrainNumber;
+import com.air.po.TrainOrder;
 import com.air.po.User;
 import com.air.po.UserContact;
 import com.air.service.OrderService;
@@ -10,9 +11,11 @@ import com.air.service.UserService;
 import com.air.utils.IdCardCheck;
 import com.air.utils.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -43,12 +46,17 @@ public class ApiController extends BaseController {
         //姓名校验和手机号校验放在jsp中,使用bootstrap的validate校验
         //身份证的校验采用jsp页面中手动点击校验的方式(校验正确性),jsp页面做基本的校验
 
-        int updatedCount = userService.saveUser(user);
-        if (updatedCount > 0) {
+        Long id = userService.saveUser(user);
+        if (id > 0) {
             modelAndView.addObject("msg", "success!");
+            //创建用户时他自己是自己的联系人
+            UserContact userContact = new UserContact();
+            userContact.setContactUserId(id);
+            userContact.setUserId(id);
+            userContactService.saveContact(userContact);
         }
 
-        modelAndView.setViewName("");
+        modelAndView.setViewName("layout/login");
         //注册成功显示一个提示然后跳转到登录页面
 
         return modelAndView;
@@ -66,8 +74,15 @@ public class ApiController extends BaseController {
         if (users != null && users.size() == 1) {
             //只能有一个
             modelAndView.addObject("msg", "ok");
-            modelAndView.setViewName("购票页面");
+            List<TrainNumber> trainNumbers = trainNumberService.listTrains(new TrainNumber());
+            modelAndView.addObject("trains", trainNumbers);
+
+            modelAndView.setViewName("layout/listtrain");
             request.getSession().setAttribute("user", users.get(0));
+        } else {
+            modelAndView.addObject("msg", "用户名或密码错误!");
+            modelAndView.addObject("data", user);
+            modelAndView.setViewName("/login");
         }
         return modelAndView;
     }
@@ -79,11 +94,10 @@ public class ApiController extends BaseController {
 
         //0. 当前用户已拥有的联系人数,已为5则结束流程
         List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
-        if (userContacts == null || userContacts.size() < 1) {
+        if (userContacts != null && userContacts.size() == 5) {
             //结束
-        }
-        if (userContacts.size() == 5) {
-            //结束
+            modelAndView.addObject("msg", "最多只能添加5个联系人!");
+            return modelAndView;
         }
         //1. 根据身份证号获取用户
         User queryUser = new User();
@@ -91,6 +105,8 @@ public class ApiController extends BaseController {
         List<User> users = userService.listAllUser(queryUser);
         if (users == null || users.size() < 1) {
             //查无此人,结束
+            modelAndView.addObject("msg", "添加失败,身份证或姓名有误!");
+            return modelAndView;
         }
 
         //2. 用户是否已经为当前用户的联系人
@@ -104,11 +120,15 @@ public class ApiController extends BaseController {
         if (isContactAlready) {
             //3. 是,结束
             //结束,已经是联系人
+            modelAndView.addObject("msg", "添加失败,该用户已经是您的联系人!");
+            return modelAndView;
         }
         //4. 不是则校验用户输入其他信息是否与真实用户信息匹配
         if (!addedUser.getIdCardNumber().equals(user.getIdCardNumber()) || !addedUser.getName().equals(user.getName())) {
             //5. 不匹配则拒绝
             //结束,有信息不正确
+            modelAndView.addObject("msg", "添加失败,身份证或姓名有误!");
+            return modelAndView;
         }
         //6. 匹配则添加至用户联系人列表中
         UserContact userContact = new UserContact();
@@ -123,17 +143,24 @@ public class ApiController extends BaseController {
     //用户可以看到购票次数和所享折扣
     //Ticket
     @RequestMapping("ticket")
-    private ModelAndView ticket(Order order) {
+    private RedirectView ticket(TrainOrder order) {
+        RedirectView redirectView = new RedirectView();
         if (currentUser == null) {
             //未登录,结束
-            return modelAndView;
+            redirectView.addStaticAttribute("msg", "请您登陆!");
+            return redirectView;
+        }
+        if (order.getUserId() == null || order.getUserId() < 1) {
+            redirectView.addStaticAttribute("msg", "请选择乘车人!");
+            modelAndView.addObject("msg", "请选择乘车人!");
+            return trainInfo(order.getTrainId());
         }
         order.setUserId(currentUser.getId());
 
         //1. 用户是否购买过当前车次
 
         int frequency = 0;
-        List<Order> userOrders = orderService.listOrdersByUserId(currentUser.getId());
+        List<TrainOrder> userOrders = orderService.listOrdersByUserId(currentUser.getId());
         if (userOrders != null && userOrders.size() > 0) {
             frequency = userOrders.size();
         }
@@ -149,6 +176,7 @@ public class ApiController extends BaseController {
 
         userOrders.add(order);
         modelAndView.addObject("orders", userOrders);
+        modelAndView.setViewName("/layout/userInfo");
         //3. 购票完之后查看自己的订单
         return modelAndView;
     }
@@ -175,6 +203,57 @@ public class ApiController extends BaseController {
         if (exist) {
             modelAndView.addObject("msg", "此身份证已注册!");
         }
+        return modelAndView;
+    }
+
+    /**
+     * 获取用户信息
+     *
+     * @return
+     */
+    @RequestMapping("userInfo")
+    private ModelAndView listContacts() {
+        modelAndView.setViewName("layout/userInfo");
+        List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
+        modelAndView.addObject("contacts", userContacts);
+        return modelAndView;
+    }
+
+    /**
+     * 获取车辆信息到order页面然后进行下单买票
+     *
+     * @return
+     */
+    @RequestMapping("trainInfo/{id}")
+    private ModelAndView trainInfo(@PathVariable("id") Long id) {
+        modelAndView.setViewName("layout/order");
+        TrainNumber trainNumber = trainNumberService.getTrainById(id);
+        modelAndView.addObject("train", trainNumber);
+
+        //contacts
+        List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
+        User contactUser;
+        for (UserContact userContact : userContacts) {
+            contactUser = userService.getUserById(userContact.getContactUserId());
+            userContact.setUserName(contactUser.getName());
+        }
+        modelAndView.addObject("contacts", userContacts);
+
+        return modelAndView;
+    }
+
+    /**
+     * 获取和查询车辆列表
+     *
+     * @param trainNumber
+     * @return
+     */
+    @RequestMapping("trains")
+    private ModelAndView trains(TrainNumber trainNumber) {
+        List<TrainNumber> trainNumbers = trainNumberService.listTrains(trainNumber);
+        modelAndView.addObject("trains", trainNumbers);
+        modelAndView.addObject("data", trainNumber);
+        modelAndView.setViewName("layout/listtrain");
         return modelAndView;
     }
 }

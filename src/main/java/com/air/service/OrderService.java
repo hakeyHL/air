@@ -1,6 +1,6 @@
 package com.air.service;
 
-import com.air.po.Order;
+import com.air.po.TrainOrder;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * Time 01:06
  */
 public interface OrderService {
-    List<Order> listOrdersByUserId(Long id);
+    List<TrainOrder> listOrdersByUserId(Long id);
 
-    void createOrder(Order order);
+    void createOrder(TrainOrder order);
 }

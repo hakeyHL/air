@@ -25,7 +25,7 @@ public abstract class BaseController {
         modelAndView.clear();
 
         //固定优先装入内容
-        modelAndView.addObject("msg", "failed");
+        modelAndView.addObject("msg", "");
         modelAndView.setViewName("error");
 
         //赋值request和response对象,以便获取request中的属性

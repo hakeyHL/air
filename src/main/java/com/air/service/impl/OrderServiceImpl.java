@@ -1,9 +1,10 @@
 package com.air.service.impl;
 
 import com.air.dao.DataBaseManagerImpl;
-import com.air.po.Order;
+import com.air.po.TrainOrder;
 import com.air.service.OrderService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -15,9 +16,9 @@ import java.util.List;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
-    private final static String ORDER_LIST_BY_USERID = "select t from Order t where t.userId=?0";
+    private final static String ORDER_LIST_BY_USERID = "select t from TrainOrder t where t.userId=?0 ";
     @Resource
-    private DataBaseManagerImpl<Order> orderDataBaseManager;
+    private DataBaseManagerImpl<TrainOrder> orderDataBaseManager;
 
     /**
      * 根据用户id获取订单列表
@@ -25,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      * @return
      */
-    public List<Order> listOrdersByUserId(Long id) {
+    public List<TrainOrder> listOrdersByUserId(Long id) {
         return orderDataBaseManager.query(ORDER_LIST_BY_USERID, Arrays.asList(id));
     }
 
@@ -34,7 +35,8 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param order
      */
-    public void createOrder(Order order) {
+    @Transactional
+    public void createOrder(TrainOrder order) {
         orderDataBaseManager.create(order);
     }
 }
