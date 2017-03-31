@@ -9,11 +9,13 @@ import com.air.service.TrainNumberService;
 import com.air.service.UserContactService;
 import com.air.service.UserService;
 import com.air.utils.IdCardCheck;
+import com.air.utils.ImageUtils;
 import com.air.utils.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -184,20 +186,22 @@ public class ApiController extends BaseController {
      * @param idCardNumber
      * @return
      */
+    @ResponseBody
     @RequestMapping("idCard/validate")
     private ModelAndView idCardValidate(@RequestParam(defaultValue = "0") String idCardNumber) {
         //1. 校验身份证是否合法
-        modelAndView.addObject("msg", "ok");
+        modelAndView.addObject("valid", true);
 
         IdCardCheck idCardCheck = new IdCardCheck(idCardNumber);
         if (idCardCheck.isCorrect() != 0) {
-            modelAndView.addObject("msg", idCardCheck.getErrMsg());
+            modelAndView.addObject("valid", false);
             return modelAndView;
         }
         //2. 重复
         boolean exist = userService.checkIdCardIsExist(idCardNumber);
         if (exist) {
-            modelAndView.addObject("msg", "此身份证已注册!");
+            //valid
+            modelAndView.addObject("valid", false);
         }
         return modelAndView;
     }
@@ -281,6 +285,31 @@ public class ApiController extends BaseController {
         modelAndView.addObject("trains", trainNumbers);
         modelAndView.addObject("data", trainNumber);
         modelAndView.setViewName("layout/listtrain");
+        return modelAndView;
+    }
+
+    /**
+     * 生成验证码
+     *
+     * @param trainNumber
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("validateCode")
+    private String validateCode(TrainNumber trainNumber) {
+        ImageUtils.getValidationCode(response, request);
+        return "ok";
+    }
+
+    /**
+     * 跳转到注册页面
+     *
+     * @param trainNumber
+     * @return
+     */
+    @RequestMapping("to/register")
+    private ModelAndView toRegisterPage(TrainNumber trainNumber) {
+        modelAndView.setViewName("layout/register");
         return modelAndView;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by linux on 2017年03月29日.
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class BaseController {
     protected ModelAndView modelAndView = new ModelAndView();
     protected HttpServletRequest request;
+    protected HttpServletResponse response;
     protected User currentUser;
 
     /*
@@ -20,7 +22,7 @@ public abstract class BaseController {
     * 被注解的方法会在进入每个controller之前执行
     * */
     @ModelAttribute
-    private void init(HttpServletRequest request) {
+    private void init(HttpServletRequest request, HttpServletResponse response) {
         //将modelAndView中属性清空
         modelAndView.clear();
 
@@ -30,6 +32,8 @@ public abstract class BaseController {
 
         //赋值request和response对象,以便获取request中的属性
         this.request = request;
+        this.response = response;
+
         User user = (User) this.request.getSession().getAttribute("user");
         if (user != null) {
             currentUser = user;

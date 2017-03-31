@@ -23,6 +23,7 @@
                             </div>
                             <button type="submit" class="btn btn-lg btn-success btn-block">登录</button>
                         </fieldset>
+                        <span>还没有账号?<a href="/api/to/register">注册</a></span>
                     </form>
                     <div style="color: red">
                         ${msg}
