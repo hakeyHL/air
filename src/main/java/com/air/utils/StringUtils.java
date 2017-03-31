@@ -13,11 +13,10 @@ public class StringUtils {
         } else {
             BigDecimal bigDecimal = BigDecimal.ONE;
             if (frequency <= 1) {
-                BigDecimal.valueOf(0.95);
+                return BigDecimal.valueOf(0.95);
             } else {
                 return bigDecimal.subtract(BigDecimal.valueOf(frequency).multiply(BigDecimal.valueOf(0.05)));
             }
         }
-        return BigDecimal.ONE;
     }
 }
