@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -143,15 +142,9 @@ public class ApiController extends BaseController {
     //用户可以看到购票次数和所享折扣
     //Ticket
     @RequestMapping("ticket")
-    private RedirectView ticket(TrainOrder order) {
-        RedirectView redirectView = new RedirectView();
-        if (currentUser == null) {
-            //未登录,结束
-            redirectView.addStaticAttribute("msg", "请您登陆!");
-            return redirectView;
-        }
+    private ModelAndView ticket(TrainOrder order) {
+        modelAndView.setViewName("message");
         if (order.getUserId() == null || order.getUserId() < 1) {
-            redirectView.addStaticAttribute("msg", "请选择乘车人!");
             modelAndView.addObject("msg", "请选择乘车人!");
             return trainInfo(order.getTrainId());
         }
@@ -175,6 +168,9 @@ public class ApiController extends BaseController {
         //2.1 这里需要测试和实现票竞争的问题
 
         userOrders.add(order);
+
+        setOrderProperties(userOrders);
+
         modelAndView.addObject("orders", userOrders);
         modelAndView.setViewName("/layout/userInfo");
         //3. 购票完之后查看自己的订单
@@ -214,9 +210,40 @@ public class ApiController extends BaseController {
     @RequestMapping("userInfo")
     private ModelAndView listContacts() {
         modelAndView.setViewName("layout/userInfo");
+
+        //用户并封装用户订单列表
+        List<TrainOrder> userOrders = orderService.listOrdersByUserId(currentUser.getId());
+        setOrderProperties(userOrders);
+        modelAndView.addObject("orders", userOrders);
+
+        //用户的联系人列表
         List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
+        for (UserContact userContact : userContacts) {
+            User user = userService.getUserById(userContact.getContactUserId());
+            if (user != null) {
+                userContact.setUserName(user.getName());
+                userContact.setIdCardNumber(user.getIdCardNumber());
+            }
+        }
         modelAndView.addObject("contacts", userContacts);
         return modelAndView;
+    }
+
+    /**
+     * 通过查询将一些要显示的属性封装到TrainOrder中
+     *
+     * @param userOrders
+     */
+    private void setOrderProperties(List<TrainOrder> userOrders) {
+        for (TrainOrder trainOrder : userOrders) {
+            //封装一些显示属性
+            TrainNumber trainNumber = trainNumberService.getTrainById(trainOrder.getTrainId());
+            User user = userService.getUserById(trainOrder.getUserId());
+            trainOrder.setPassenger(user.getName());
+            trainOrder.setStartSite(trainNumber.getStartSite());
+            trainOrder.setEndSite(trainNumber.getEndSite());
+            trainOrder.setPrice(trainNumber.getPrice());
+        }
     }
 
     /**

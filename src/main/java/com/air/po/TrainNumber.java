@@ -21,6 +21,7 @@ public class TrainNumber {
 
     private String endSite;//终到站
 
+    private float price;//价格
 
     public Long getId() {
         return id;
@@ -60,5 +61,13 @@ public class TrainNumber {
 
     public void setEndSite(String endSite) {
         this.endSite = endSite;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
     }
 }

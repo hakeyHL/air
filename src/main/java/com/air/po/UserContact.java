@@ -20,6 +20,8 @@ public class UserContact {
     //标注为不自动创建列
     @Transient
     private String userName;//乘车人姓名
+    @Transient
+    private String IdCardNumber;//联系人身份证号
 
     public Long getId() {
         return id;
@@ -51,5 +53,13 @@ public class UserContact {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getIdCardNumber() {
+        return IdCardNumber;
+    }
+
+    public void setIdCardNumber(String idCardNumber) {
+        IdCardNumber = idCardNumber;
     }
 }
