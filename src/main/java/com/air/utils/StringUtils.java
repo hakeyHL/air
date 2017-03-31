@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 /**
  * Created by linux on 2017年03月30日.
+ * 计算折扣值
  * Time 01:52
  */
 public class StringUtils {
