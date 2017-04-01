@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 params.add(user.getIdCardNumber());
                 ++i;
             } else if (StringUtils.isNotEmpty(user.getLoginName())) {
-                stringBuilder.append(" and t.idCardNumber=?").append(i);
+                stringBuilder.append(" or t.idCardNumber=?").append(i);
                 params.add(user.getLoginName().trim());
                 ++i;
             }

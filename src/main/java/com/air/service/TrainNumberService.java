@@ -12,4 +12,6 @@ public interface TrainNumberService {
     TrainNumber getTrainById(Long id);
 
     List<TrainNumber> listTrains(TrainNumber trainNumber);
+
+    void updateTrainInfo(TrainNumber trainNumber);
 }

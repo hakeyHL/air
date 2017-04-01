@@ -5,6 +5,7 @@ import com.air.po.TrainNumber;
 import com.air.service.TrainNumberService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.LinkedList;
@@ -50,5 +51,15 @@ public class TrainNumberServiceImpl implements TrainNumberService {
 
         }
         return dataBaseManager.query(stringBuilder.toString(), params);
+    }
+
+    /**
+     * 更新车次信息
+     *
+     * @param trainNumber
+     */
+    @Transactional
+    public void updateTrainInfo(TrainNumber trainNumber) {
+        dataBaseManager.update(trainNumber);
     }
 }

@@ -11,7 +11,19 @@
 		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
     <mvc:annotation-driven/>
     <context:component-scan base-package="com.air.controller"/>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/api/login"></mvc:exclude-mapping>
+            <bean class="com.air.interceptor.UserLoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
     <mvc:resources location="classpath:/static/" mapping="/static/**"/>
+
     <bean id="jspViewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass">
@@ -23,7 +35,4 @@
         <property name="suffix" value=".jsp"/>
         <property name="order" value="2"/>
     </bean>
-
-    <!-- 支持上传文件 -->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 </beans>
