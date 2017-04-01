@@ -4,6 +4,7 @@ import com.air.dao.DataBaseManagerImpl;
 import com.air.po.UserContact;
 import com.air.service.UserContactService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ public class UserContactServiceImpl implements UserContactService {
      *
      * @param userContact
      */
+    @Transactional
     public void saveContact(UserContact userContact) {
         dataBaseManager.create(userContact);
     }

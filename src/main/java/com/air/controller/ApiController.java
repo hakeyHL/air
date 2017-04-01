@@ -21,7 +21,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linux on 2017年03月28日.
@@ -49,7 +51,7 @@ public class ApiController extends BaseController {
 
         Long id = userService.saveUser(user);
         if (id > 0) {
-            modelAndView.addObject("msg", "success!");
+            modelAndView.addObject("msg", "谢谢您加入我们!");
             //创建用户时他自己是自己的联系人
             UserContact userContact = new UserContact();
             userContact.setContactUserId(id);
@@ -57,7 +59,7 @@ public class ApiController extends BaseController {
             userContactService.saveContact(userContact);
         }
 
-        modelAndView.setViewName("layout/login");
+        modelAndView.setViewName("login");
         //注册成功显示一个提示然后跳转到登录页面
 
         return modelAndView;
@@ -188,22 +190,23 @@ public class ApiController extends BaseController {
      */
     @ResponseBody
     @RequestMapping("idCard/validate")
-    private ModelAndView idCardValidate(@RequestParam(defaultValue = "0") String idCardNumber) {
+    private Map idCardValidate(@RequestParam(defaultValue = "0") String idCardNumber) {
+        Map dateMap = new HashMap();
         //1. 校验身份证是否合法
-        modelAndView.addObject("valid", true);
+        dateMap.put("valid", true);
 
         IdCardCheck idCardCheck = new IdCardCheck(idCardNumber);
         if (idCardCheck.isCorrect() != 0) {
-            modelAndView.addObject("valid", false);
-            return modelAndView;
+            dateMap.put("valid", false);
+            return dateMap;
         }
         //2. 重复
         boolean exist = userService.checkIdCardIsExist(idCardNumber);
         if (exist) {
             //valid
-            modelAndView.addObject("valid", false);
+            dateMap.put("valid", false);
         }
-        return modelAndView;
+        return dateMap;
     }
 
     /**
@@ -291,14 +294,22 @@ public class ApiController extends BaseController {
     /**
      * 生成验证码
      *
-     * @param trainNumber
      * @return
      */
     @ResponseBody
     @RequestMapping("validateCode")
-    private String validateCode(TrainNumber trainNumber) {
-        ImageUtils.getValidationCode(response, request);
-        return "ok";
+    private Map validateCode(String validateCode) {
+        Map dataMap = new HashMap();
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(validateCode)) {
+            //验证
+            String sessionValidateCode = (String) request.getSession().getAttribute("validateCode");
+            if (sessionValidateCode.toLowerCase().trim().equals(validateCode)) {
+                dataMap.put("valid", true);
+            }
+        } else {
+            ImageUtils.getValidationCode(response, request);
+        }
+        return dataMap;
     }
 
     /**

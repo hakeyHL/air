@@ -12,7 +12,7 @@
                     <h3 class="panel-title">欢迎注册!</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" action="/api/register" method="post" id="defaultForm">
+                    <form role="form" action="/api/register" method="post" onsubmit="onsubmitFn()" id="defaultForm">
                         <fieldset>
 
                             <div class="form-group">
@@ -39,12 +39,31 @@
                             <div class="form-group">
                                 <input type="password" class="form-control" placeholder="密码" name="password" value=""/>
                             </div>
-
+                            <div class="form-group">
+                                <input type="password" name="repeatPassword" class="form-control" placeholder="确认密码"
+                                       id="repeatPassword"
+                                       value=""/>
+                            </div>
 
                             <div class="form-group">
-                                <img src="/api/validateCode" name="validateCode">
+                                <div class="col-lg-6">
+                                    <input class="form-control" type="text" placeholder="验证码"
+                                           id="validateCode" name="validateCode"/>
+                                </div>
+                                <div class="col-lg-5">
+                                    <img class="form-control" src="/api/validateCode" id="verification"
+                                         onclick="refreshcode()">
+                                </div>
                             </div>
-                            <button type="submit" id="validateBtn" class="btn btn-lg btn-success btn-block">注册</button>
+
+                            <div class="form-control">
+                                <select id="passengerSelected" class="form-control" name="sex">
+                                    <option value="1" selected>男</option>
+                                    <option value="0" selected>女</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="validateBtn" class="btn btn-lg btn-success btn-block">注册
+                            </button>
                         </fieldset>
                     </form>
                     <div style="color: red">
@@ -56,6 +75,10 @@
     </div>
 </div>
 <script type="text/javascript" language="JavaScript">
+
+    function refreshcode() {
+        document.getElementById("verification").src = "/api/validateCode?hehe=" + Math.random();
+    }
     /*
      *表单校验
      */
@@ -104,7 +127,37 @@
                         }
                     }
                 },
+                repeatPassword: {
+                    validators: {
+                        notEmpty: {
+                            message: '请填写确认密码'
+                        },
+                        identical: {
+                            field: 'password',
+                            message: '确认密码与密码不一致'
+                        },
+                    }
+                },
+                validateCode: {
+                    verbose: false,
+                    validators: {
+                        notEmpty: {
+                            message: '请填写验证码'
+                        },
+                        stringLength: {
+                            min: 4,
+                            message: '验证码为4位'
+                        },
+                        remote: {
+                            type: 'GET',
+                            url: '/api/validateCode',
+                            message: '验证码不匹配',
+                            delay: 1000
+                        }
+                    }
+                },
                 idCardNumber: {
+                    verbose: false,
                     validators: {
                         notEmpty: {
                             message: '请填写身份证号码'
@@ -112,19 +165,29 @@
                         stringLength: {
                             min: 15,
                             max: 18,
-                            message: '身份证不少于15位'
+                            message: '身份证不少于15位,不高于18位'
+                        },
+                        remote: {
+                            type: 'GET',
+                            url: '/api/idCard/validate',
+                            message: '身份证不合法或该ID已注册',
+                            delay: 500
                         }
                     }
                 }
             }
-        });
+        })
+        ;
     });
 
     /*
      * 当点击了确定下单的按钮后调用此方法
      * 然后执行表单校验
      * */
-    $('#validateBtn').click(function () {
-        $('#defaultForm').bootstrapValidator('validate');
-    });
+
+    function onsubmitFn() {
+        var bootstrapValidator = $("#defaultForm").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        return bootstrapValidator.validate();
+    }
 </script>

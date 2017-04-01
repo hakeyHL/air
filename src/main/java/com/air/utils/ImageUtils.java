@@ -87,7 +87,7 @@ public class ImageUtils {
             // 在图形上输出验证码字符，x和y都是随机生成的
             g.drawString(validationCode.toString(), 16 + random.nextInt(7), height - random.nextInt(6));
 
-            request.getSession().setAttribute("validateCode", validationCode);
+            request.getSession().setAttribute("validateCode", validationCode.toString().toLowerCase());
             //名称重置
             ImageIO.write(image, "jpg", response.getOutputStream());
             g.dispose();

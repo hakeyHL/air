@@ -22,6 +22,7 @@ public class UserServiceImpl implements UserService {
     @Resource
     IDataBaseManager<User> dataBaseManager;
 
+    @Transactional
     public Long saveUser(User user) {
         return (Long) dataBaseManager.create(user);
     }
@@ -38,29 +39,33 @@ public class UserServiceImpl implements UserService {
         if (user != null) {
             if (StringUtils.isNotEmpty(user.getLoginName())) {
                 stringBuilder.append(" and t.loginName like ?").append(i);
-                params.add(user.getLoginName() + "%");
+                params.add(user.getLoginName().trim() + "%");
                 ++i;
             }
             if (StringUtils.isNotEmpty(user.getName())) {
                 stringBuilder.append(" and t.name=?").append(i);
-                params.add(user.getName());
+                params.add(user.getName().trim());
                 ++i;
             }
             if (StringUtils.isNotEmpty(user.getIdCardNumber())) {
                 stringBuilder.append(" and t.idCardNumber=?").append(i);
                 params.add(user.getIdCardNumber());
                 ++i;
+            } else if (StringUtils.isNotEmpty(user.getLoginName())) {
+                stringBuilder.append(" and t.idCardNumber=?").append(i);
+                params.add(user.getLoginName().trim());
+                ++i;
             }
 
             if (StringUtils.isNotEmpty(user.getPassword())) {
                 stringBuilder.append(" and t.password=?").append(i);
-                params.add(user.getPassword());
+                params.add(user.getPassword().trim());
                 ++i;
             }
 
             if (StringUtils.isNotEmpty(user.getPhone())) {
                 stringBuilder.append(" and t.phone=?").append(i);
-                params.add(user.getPhone());
+                params.add(user.getPhone().trim());
                 ++i;
             }
 
