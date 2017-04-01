@@ -13,7 +13,7 @@ public class StringUtils {
             return BigDecimal.valueOf(0.7);
         } else {
             BigDecimal bigDecimal = BigDecimal.ONE;
-            if (frequency <= 1) {
+            if (frequency <= 0) {
                 return BigDecimal.valueOf(0.95);
             } else {
                 return bigDecimal.subtract(BigDecimal.valueOf(frequency).multiply(BigDecimal.valueOf(0.05)));
