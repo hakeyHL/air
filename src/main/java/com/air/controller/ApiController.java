@@ -198,18 +198,18 @@ public class ApiController extends BaseController {
         ConstantUtils.subTicketCountFromQuque(order.getTrainId());
         try {
             orderService.createOrder(order);
-            //获取该车次信息
-            TrainNumber trainNumber = trainNumberService.getTrainById(order.getTrainId());
-            if (trainNumber != null) {
-                trainNumber.setSeatsNumber(trainNumber.getSeatsNumber() - 1);
-                trainNumberService.updateTrainInfo(trainNumber);
-            }
-            //更新库存
         } catch (Exception e) {
             //如果发生异常就还原库存
             ConstantUtils.subTicketCountFromQuque(order.getTrainId());
             modelAndView.addObject("msg", "服务器故障,请联系管理员!");
             return trainInfo(order.getTrainId());
+        }
+        //获取该车次信息
+        TrainNumber trainNumber = trainNumberService.getTrainById(order.getTrainId());
+        if (trainNumber != null) {
+            trainNumber.setSeatsNumber(trainNumber.getSeatsNumber() - 1);
+            //更新库存
+            trainNumberService.updateTrainInfo(trainNumber);
         }
         userOrders.add(order);
 
@@ -264,6 +264,9 @@ public class ApiController extends BaseController {
         return modelAndView;
     }
 
+    /**
+     * 获取用户的联系人列表并放入到modelAndView中用于页面显示
+     */
     private void addUserContact2ModelAndView() {
         List<UserContact> userContacts = userContactService.listUserContacts(currentUser.getId());
         for (UserContact userContact : userContacts) {
