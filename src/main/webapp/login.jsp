@@ -12,7 +12,7 @@
                     <h3 class="panel-title">请登录</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" action="/api/login" method="post">
+                    <form role="form" action="${pageContext.request.contextPath }/api/login" method="post">
                         <fieldset>
                             <div class="form-group">
                                 <input class="form-control" placeholder="用户名/身份证号" name="loginName" type="text"
@@ -23,7 +23,7 @@
                             </div>
                             <button type="submit" class="btn btn-lg btn-success btn-block">登录</button>
                         </fieldset>
-                        <span>还没有账号?<a href="/api/to/register">注册</a></span>
+                        <span>还没有账号?<a href="${pageContext.request.contextPath }/api/to/register">注册</a></span>
                     </form>
                     <div style="color: red">
                         ${msg}

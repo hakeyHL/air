@@ -36,6 +36,7 @@
                                        name="idCardNumber" id="idCardNumber" type="text">
                             </div>
 
+
                             <div class="form-group">
                                 <input type="password" class="form-control" placeholder="密码" name="password" value=""/>
                             </div>
@@ -44,6 +45,15 @@
                                        id="repeatPassword"
                                        value=""/>
                             </div>
+
+
+                            <div class="form-group">
+                                <select id="passengerSelected" class="form-control" name="sex">
+                                    <option value="1" selected>男</option>
+                                    <option value="0" selected>女</option>
+                                </select>
+                            </div>
+
 
                             <div class="form-group">
                                 <div class="col-lg-6">
@@ -56,14 +66,10 @@
                                 </div>
                             </div>
 
-                            <div class="form-control">
-                                <select id="passengerSelected" class="form-control" name="sex">
-                                    <option value="1" selected>男</option>
-                                    <option value="0" selected>女</option>
-                                </select>
+                            <div class="form-group">
+                                <button type="submit" id="validateBtn" class="btn btn-lg btn-success btn-block">注册
+                                </button>
                             </div>
-                            <button type="submit" id="validateBtn" class="btn btn-lg btn-success btn-block">注册
-                            </button>
                         </fieldset>
                     </form>
                     <div style="color: red">

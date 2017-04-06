@@ -15,14 +15,18 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <mvc:exclude-mapping path="/"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/api/register"></mvc:exclude-mapping>
             <mvc:exclude-mapping path="/api/login"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/api/idCard/validate"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/api/validateCode"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/api/to/register"></mvc:exclude-mapping>
+            <mvc:exclude-mapping path="/static/**"></mvc:exclude-mapping>
             <bean class="com.air.interceptor.UserLoginInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 
 
-    <mvc:resources location="classpath:/static/" mapping="/static/**"/>
+    <mvc:resources mapping="/static/**" location="/static/"/>
 
     <bean id="jspViewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver">

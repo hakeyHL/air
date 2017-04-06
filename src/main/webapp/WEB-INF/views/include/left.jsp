@@ -20,10 +20,11 @@
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li>
-                        <a href="/api/userInfo"> 个人中心<span class="fa arrow"></span></a>
+                        <a href="${pageContext.request.contextPath }/api/userInfo"> 个人中心<span
+                                class="fa arrow"></span></a>
                     </li>
                     <li>
-                        <a href="/api/trains"> 购票<span class="fa arrow"></span></a>
+                        <a href="${pageContext.request.contextPath }/api/trains"> 购票<span class="fa arrow"></span></a>
                     </li>
                 </ul>
             </div>
